@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 public/vendor
+public/icons.svg
+site-source.tar
+src/assets/
 *.local
 
 # Editor directories and files
