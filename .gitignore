@@ -17,6 +17,7 @@ src/assets/
 *.local
 __pycache__/
 *.pyc
+.openai/
 
 # Editor directories and files
 .vscode/*

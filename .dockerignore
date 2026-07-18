@@ -1,0 +1,10 @@
+.git
+.gitignore
+.openai
+.pytest_cache
+__pycache__
+docs
+node_modules
+public/vendor
+site-source.tar
+tests/__pycache__

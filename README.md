@@ -29,6 +29,17 @@ npm run dev
 
 `npm install` and `npm run build` both copy the local Tesseract assets through `scripts/copy-tesseract-assets.mjs`.
 
+## Docker
+
+Build and run:
+
+```bash
+docker build -t label-lens .
+docker run --rm -p 8080:8080 label-lens
+```
+
+Then open `http://localhost:8080`.
+
 ## Links
 
 - Live prototype: https://rektsr0.github.io/treasury-takehome/

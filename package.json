@@ -8,6 +8,7 @@
     "prepare:tesseract": "node ./scripts/copy-tesseract-assets.mjs",
     "postinstall": "npm run prepare:tesseract",
     "build": "npm run prepare:tesseract && tsc -b && vite build",
+    "build:docker": "npm run prepare:tesseract && tsc -b && vite build --base=/ --outDir dist",
     "lint": "oxlint src scripts vite.config.ts",
     "preview": "vite preview"
   },
