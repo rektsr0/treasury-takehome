@@ -3,7 +3,7 @@ import type { OcrResult } from '../types.ts';
 type TesseractApi = typeof import('tesseract.js');
 type TesseractWorker = import('tesseract.js').Worker;
 
-const assetBase = '/vendor/tesseract';
+const assetBase = `${import.meta.env.BASE_URL}vendor/tesseract`;
 let tesseractPromise: Promise<TesseractApi> | null = null;
 let workerPromise: Promise<TesseractWorker> | null = null;
 let activeProgressListener: ((message: string) => void) | null = null;
@@ -22,32 +22,37 @@ const loadTesseract = async (): Promise<TesseractApi> => {
 
 const getWorker = async () => {
   if (!workerPromise) {
-    workerPromise = loadTesseract().then(async (tesseract) => {
-      const worker = await tesseract.createWorker('eng', tesseract.OEM.LSTM_ONLY, {
-        workerPath: `${assetBase}/dist/worker.min.js`,
-        corePath: `${assetBase}/core`,
-        langPath: `${assetBase}/lang`,
-        logger: (message) => {
-          if (!activeProgressListener) {
-            return;
-          }
+    workerPromise = loadTesseract()
+      .then(async (tesseract) => {
+        const worker = await tesseract.createWorker('eng', tesseract.OEM.LSTM_ONLY, {
+          workerPath: `${assetBase}/dist/worker.min.js`,
+          corePath: `${assetBase}/core`,
+          langPath: `${assetBase}/lang`,
+          logger: (message) => {
+            if (!activeProgressListener) {
+              return;
+            }
 
-          const percent = Math.max(1, Math.round(message.progress * 100));
-          activeProgressListener(`${message.status.replaceAll('-', ' ')} ${percent}%`);
-        },
-        errorHandler: (error) => {
-          console.error('Tesseract worker error', error);
-        },
+            const percent = Math.max(1, Math.round(message.progress * 100));
+            activeProgressListener(`${message.status.replaceAll('-', ' ')} ${percent}%`);
+          },
+          errorHandler: (error) => {
+            console.error('Tesseract worker error', error);
+          },
+        });
+
+        await worker.setParameters({
+          tessedit_pageseg_mode: tesseract.PSM.SPARSE_TEXT,
+          preserve_interword_spaces: '1',
+          user_defined_dpi: '300',
+        });
+
+        return worker;
+      })
+      .catch((error) => {
+        workerPromise = null;
+        throw error;
       });
-
-      await worker.setParameters({
-        tessedit_pageseg_mode: tesseract.PSM.SPARSE_TEXT,
-        preserve_interword_spaces: '1',
-        user_defined_dpi: '300',
-      });
-
-      return worker;
-    });
   }
 
   return workerPromise;

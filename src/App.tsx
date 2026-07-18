@@ -249,6 +249,13 @@ function App() {
   };
 
   const reviewRecord = async (id: string) => {
+    const anotherReviewIsActive = recordsRef.current.some(
+      (entry) => entry.id !== id && entry.isReviewing,
+    );
+    if (anotherReviewIsActive) {
+      return;
+    }
+
     const record = recordsRef.current.find((entry) => entry.id === id);
     if (!record) {
       return;
@@ -521,14 +528,14 @@ function App() {
 
                               event.currentTarget.value = '';
                             }}
-                            disabled={record.isReviewing}
+                            disabled={activeReviews}
                           />
                         </label>
                         <button
                           type="button"
                           className="primary-button"
                           onClick={() => void reviewRecord(record.id)}
-                          disabled={record.isReviewing || isBatchReviewing}
+                          disabled={activeReviews}
                         >
                           {record.isReviewing ? 'Reviewing...' : 'Review this label'}
                         </button>
@@ -536,7 +543,7 @@ function App() {
                           type="button"
                           className="ghost-button"
                           onClick={() => resetResult(record.id)}
-                          disabled={record.isReviewing}
+                          disabled={activeReviews}
                         >
                           Clear result
                         </button>
@@ -544,7 +551,7 @@ function App() {
                           type="button"
                           className="ghost-button danger-button"
                           onClick={() => removeRecord(record.id)}
-                          disabled={record.isReviewing}
+                          disabled={activeReviews}
                         >
                           Remove
                         </button>
