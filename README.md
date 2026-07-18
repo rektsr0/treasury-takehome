@@ -38,5 +38,5 @@ npm run dev
 
 ## Submission artifacts
 
-- Live prototype: pending deployment
-- Source repository: pending remote publish
+- Live prototype: https://rektsr0.github.io/treasury-takehome/
+- Source repository: https://github.com/rektsr0/treasury-takehome
