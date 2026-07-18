@@ -1,7 +1,7 @@
 import { startTransition, useEffect, useRef, useState } from 'react';
 import './App.css';
 import { recognizeLabel, warmOcrEngine } from './lib/ocr.ts';
-import { buildDemoBatch } from './lib/sampleLabels.ts';
+import { buildSampleBatch } from './lib/sampleLabels.ts';
 import { verifyApplicationRecord } from './lib/verification.ts';
 import type { ApplicationRecord, LabelSource } from './types.ts';
 
@@ -101,7 +101,7 @@ const getRecordStatus = (record: ApplicationRecord) => {
 
 function App() {
   const [records, setRecords] = useState<ApplicationRecord[]>([]);
-  const [isLoadingDemo, setIsLoadingDemo] = useState(true);
+  const [isLoadingSamples, setIsLoadingSamples] = useState(true);
   const [isBatchReviewing, setIsBatchReviewing] = useState(false);
   const [ocrState, setOcrState] = useState<'warming' | 'ready' | 'error'>('warming');
   const recordsRef = useRef(records);
@@ -113,9 +113,9 @@ function App() {
   useEffect(() => {
     const initialize = async () => {
       try {
-        const [demoBatch] = await Promise.all([buildDemoBatch(), warmOcrEngine()]);
+        const [sampleBatch] = await Promise.all([buildSampleBatch(), warmOcrEngine()]);
         startTransition(() => {
-          setRecords(demoBatch);
+          setRecords(sampleBatch);
           setOcrState('ready');
         });
       } catch (error) {
@@ -125,7 +125,7 @@ function App() {
           setOcrState('error');
         });
       } finally {
-        setIsLoadingDemo(false);
+        setIsLoadingSamples(false);
       }
     };
 
@@ -170,8 +170,8 @@ function App() {
     }));
   };
 
-  const loadDemoQueue = async () => {
-    setIsLoadingDemo(true);
+  const loadSampleQueue = async () => {
+    setIsLoadingSamples(true);
 
     const existingUploads = recordsRef.current.map((record) => record.label);
     for (const label of existingUploads) {
@@ -179,10 +179,10 @@ function App() {
     }
 
     try {
-      const demoBatch = await buildDemoBatch();
-      replaceRecords(demoBatch);
+      const sampleBatch = await buildSampleBatch();
+      replaceRecords(sampleBatch);
     } finally {
-      setIsLoadingDemo(false);
+      setIsLoadingSamples(false);
     }
   };
 
@@ -324,19 +324,18 @@ function App() {
     <main className="page-shell">
       <section className="hero-panel">
         <div>
-          <p className="eyebrow">Treasury RGB take-home prototype</p>
+          <p className="eyebrow">Alcohol label review</p>
           <h1>Label Lens</h1>
           <p className="hero-copy">
-            Browser-only OCR for alcohol label review. The prototype batches labels,
-            compares application fields against detected text, and flags warning-statement
-            mismatches without calling any external AI API.
+            Upload label images, compare OCR text against application fields, and flag
+            mismatches before manual review.
           </p>
           <div className="hero-actions">
             <button type="button" className="primary-button" onClick={() => void reviewAllRecords()} disabled={activeReviews || !records.length}>
               Review all queued labels
             </button>
-            <button type="button" className="ghost-button" onClick={() => void loadDemoQueue()} disabled={isLoadingDemo || activeReviews}>
-              Reload demo queue
+            <button type="button" className="ghost-button" onClick={() => void loadSampleQueue()} disabled={isLoadingSamples || activeReviews}>
+              Load sample queue
             </button>
           </div>
         </div>
@@ -347,16 +346,16 @@ function App() {
               OCR {ocrState === 'warming' ? 'warming up' : ocrState}
             </span>
             <p>
-              First load prepares the OCR engine locally. After warm-up, repeated label
-              reviews stay inside the browser and avoid third-party ML dependencies.
+              The first load starts the OCR worker and caches the language files in the
+              browser.
             </p>
           </div>
           <div className="seal-card">
-            <strong>Prototype scope</strong>
+            <strong>Current checks</strong>
             <p>
               Checks brand, class/type, alcohol content, net contents, producer/country,
-              and the federal government warning statement. Formatting items still surface
-              as human follow-up.
+              and the federal government warning statement. Warning formatting still needs
+              a visual check.
             </p>
           </div>
         </aside>
@@ -385,8 +384,8 @@ function App() {
         <div className="controls-copy">
           <h2>Batch queue</h2>
           <p>
-            Start with the bundled demo batch or append your own labels in one upload. Each
-            review card stores the application details Treasury reviewers need for comparison.
+            Start with the sample queue or add your own labels. Each record keeps the
+            fields used during review.
           </p>
         </div>
 
@@ -417,16 +416,15 @@ function App() {
             <h2>Applications</h2>
           </div>
           <p className="panel-caption">
-            Sample 3 is intentionally configured to fail so the review output shows how
-            mismatches are surfaced.
+            One sample contains mismatches so the attention state is easy to verify.
           </p>
         </div>
 
-        {isLoadingDemo ? (
-          <div className="empty-state">Preparing sample labels and local OCR assets...</div>
+        {isLoadingSamples ? (
+          <div className="empty-state">Loading sample labels...</div>
         ) : records.length === 0 ? (
           <div className="empty-state">
-            No applications in the queue. Add a blank application or upload a label batch.
+            No applications in the queue. Add one or upload label images.
           </div>
         ) : (
           <div className="records-stack">
@@ -563,7 +561,7 @@ function App() {
                           />
                           <div className="preview-meta">
                             <strong>{record.label.name}</strong>
-                            <span>{record.label.kind === 'sample' ? 'Bundled demo label' : 'Uploaded label'}</span>
+                            <span>{record.label.kind === 'sample' ? 'Sample label' : 'Uploaded label'}</span>
                           </div>
                         </div>
                       ) : (

@@ -13,6 +13,7 @@ interface SampleBlueprint {
   labelWarning?: string;
   accentColor: string;
   bannerColor: string;
+  bannerText: string;
   subtitle: string;
 }
 
@@ -26,7 +27,8 @@ const SAMPLE_BLUEPRINTS: SampleBlueprint[] = [
     countryOfOrigin: 'Product of USA',
     accentColor: '#8b5e34',
     bannerColor: '#efe1c1',
-    subtitle: 'Batch A-104 / domestic',
+    bannerText: 'KENTUCKY RESERVE',
+    subtitle: 'Small Batch Bourbon',
   },
   {
     brandName: "Stone's Throw",
@@ -38,7 +40,8 @@ const SAMPLE_BLUEPRINTS: SampleBlueprint[] = [
     labelBrandName: "STONE'S THROW",
     accentColor: '#1f5662',
     bannerColor: '#d9eef2',
-    subtitle: 'Importer queue / punctuation variance',
+    bannerText: 'DISTILLED IN SEATTLE',
+    subtitle: 'London Dry Gin',
   },
   {
     brandName: 'Harbor Light Rum',
@@ -52,7 +55,8 @@ const SAMPLE_BLUEPRINTS: SampleBlueprint[] = [
       'Government Warning: (1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.',
     accentColor: '#8b3a2d',
     bannerColor: '#f7d9cf',
-    subtitle: 'Imported sample / expected rejection',
+    bannerText: 'CARIBBEAN RESERVE',
+    subtitle: 'Imported Rum',
   },
 ];
 
@@ -112,7 +116,7 @@ const createLabelImage = (blueprint: SampleBlueprint) => {
   context.textAlign = 'center';
   context.textBaseline = 'top';
   context.font = '600 32px Trebuchet MS';
-  context.fillText('ALCOHOL BEVERAGE LABEL REVIEW SAMPLE', canvas.width / 2, 128);
+  context.fillText(blueprint.bannerText, canvas.width / 2, 128);
 
   context.font = '700 96px Georgia';
   context.fillStyle = blueprint.accentColor;
@@ -164,7 +168,7 @@ const createLabelImage = (blueprint: SampleBlueprint) => {
 
 const createId = () => crypto.randomUUID();
 
-export const buildDemoBatch = async (): Promise<ApplicationRecord[]> =>
+export const buildSampleBatch = async (): Promise<ApplicationRecord[]> =>
   SAMPLE_BLUEPRINTS.map((blueprint) => {
     const image = createLabelImage(blueprint);
 

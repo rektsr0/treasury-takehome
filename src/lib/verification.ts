@@ -132,7 +132,7 @@ const buildTextCheck = (
       status: 'pass',
       expected,
       actual: bestMatch.line || expected,
-      detail: 'Matched against the OCR output.',
+      detail: 'Found in OCR text.',
     };
   }
 
@@ -143,7 +143,7 @@ const buildTextCheck = (
       status: 'manual',
       expected,
       actual: bestMatch.line,
-      detail: 'Close OCR match detected. Human judgment is recommended before approval.',
+      detail: 'Close match found. Check manually.',
     };
   }
 
@@ -174,7 +174,7 @@ const buildAlcoholCheck = (expected: string, ocr: OcrResult): FieldCheck => {
       status: 'pass',
       expected,
       actual: actualSnippet,
-      detail: 'Alcohol percentage matched the label.',
+      detail: 'Alcohol statement matched.',
     };
   }
 
@@ -185,7 +185,7 @@ const buildAlcoholCheck = (expected: string, ocr: OcrResult): FieldCheck => {
       status: 'fail',
       expected,
       actual: actualSnippet,
-      detail: 'A different alcohol statement was detected on the label.',
+      detail: 'Detected alcohol statement does not match.',
     };
   }
 
@@ -211,7 +211,7 @@ const buildNetContentsCheck = (expected: string, ocr: OcrResult): FieldCheck => 
       status: 'pass',
       expected,
       actual: detected,
-      detail: 'Net contents matched the application record.',
+      detail: 'Net contents matched.',
     };
   }
 
@@ -222,7 +222,7 @@ const buildNetContentsCheck = (expected: string, ocr: OcrResult): FieldCheck => 
       status: 'fail',
       expected,
       actual: detected,
-      detail: 'The net contents statement on the label does not match the application.',
+      detail: 'Detected net contents do not match.',
     };
   }
 
@@ -254,14 +254,13 @@ const buildWarningChecks = (ocr: OcrResult): FieldCheck[] => {
         status: 'pass',
         expected: 'Exact federal warning text',
         actual: 'Exact warning detected',
-        detail: 'The required warning text was found as a continuous statement.',
+        detail: 'Required warning text found.',
       },
       {
         key: 'warningFormatting',
         label: 'Warning formatting follow-up',
         status: 'manual',
-        detail:
-          'OCR confirmed the uppercase heading text, but bold weight, font size, and contrast still need a visual check.',
+        detail: 'Heading was found, but formatting still needs a visual check.',
       },
     ];
   }
@@ -274,8 +273,7 @@ const buildWarningChecks = (ocr: OcrResult): FieldCheck[] => {
         status: 'fail',
         expected: 'GOVERNMENT WARNING: heading in all caps',
         actual: 'Warning body detected, but heading case did not match',
-        detail:
-          'Most of the warning language is present, but the label did not preserve the required all-caps heading.',
+        detail: 'Warning body was found, but the heading is not all caps.',
       },
     ];
   }
@@ -288,8 +286,7 @@ const buildWarningChecks = (ocr: OcrResult): FieldCheck[] => {
         status: 'manual',
         expected: 'Exact federal warning text',
         actual: 'Partial warning detected',
-        detail:
-          'Most warning terms were detected, but OCR could not confirm an exact match. Manual review is recommended.',
+        detail: 'Most of the warning was found, but the match was not exact.',
       },
     ];
   }
@@ -336,10 +333,10 @@ export const verifyApplicationRecord = (
   const manualCount = checks.filter((check) => check.status === 'manual').length;
   const headline =
     failedCount > 0
-      ? `${failedCount} required check${failedCount === 1 ? '' : 's'} need attention.`
+      ? `${failedCount} check${failedCount === 1 ? '' : 's'} need attention.`
       : manualCount > 0
-        ? `Core fields matched. ${manualCount} visual follow-up${manualCount === 1 ? '' : 's'} remain.`
-        : 'All configured checks matched the label.';
+        ? `${manualCount} item${manualCount === 1 ? '' : 's'} still need review.`
+        : 'All checks passed.';
 
   return {
     overall: failedCount > 0 ? 'attention' : 'pass',
