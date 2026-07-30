@@ -64,6 +64,7 @@ npm run dev
 ## Verification
 
 ```bash
+python -m pip install -r requirements-dev.txt
 npm run lint
 npm run build
 python -m pytest -q
