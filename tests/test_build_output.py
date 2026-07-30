@@ -25,6 +25,19 @@ def test_docs_build_uses_github_pages_asset_base() -> None:
 
     index_html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
     assert "/treasury-takehome/assets/" in index_html
+    assert (ROOT / "docs" / ".nojekyll").is_file()
+
+    worker_path = (
+        ROOT / "docs" / "vendor" / "tesseract" / "dist" / "worker.min.js"
+    )
+    assert worker_path.is_file()
+
+    ignored = subprocess.run(
+        ["git", "check-ignore", "--quiet", str(worker_path.relative_to(ROOT))],
+        cwd=ROOT,
+        check=False,
+    )
+    assert ignored.returncode == 1, "The deployed OCR worker must not be ignored by Git"
 
 
 def test_built_bundle_uses_pages_safe_tesseract_path() -> None:

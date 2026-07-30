@@ -9,6 +9,8 @@ lerna-debug.log*
 
 node_modules
 dist
+!docs/vendor/tesseract/dist/
+!docs/vendor/tesseract/dist/worker.min.js
 dist-ssr
 public/vendor
 public/icons.svg
