@@ -92,6 +92,28 @@ const wrapText = (
   return currentY;
 };
 
+const setFittedFont = (
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  preferredSize: number,
+  minimumSize: number,
+  weight: number,
+  family: string,
+) => {
+  let fontSize = preferredSize;
+
+  while (fontSize > minimumSize) {
+    context.font = `${weight} ${fontSize}px ${family}`;
+    if (context.measureText(text).width <= maxWidth) {
+      return;
+    }
+    fontSize -= 2;
+  }
+
+  context.font = `${weight} ${minimumSize}px ${family}`;
+};
+
 const createLabelImage = (blueprint: SampleBlueprint) => {
   const canvas = document.createElement('canvas');
   canvas.width = 1200;
@@ -118,13 +140,18 @@ const createLabelImage = (blueprint: SampleBlueprint) => {
   context.font = '600 32px Trebuchet MS';
   context.fillText(blueprint.bannerText, canvas.width / 2, 128);
 
-  context.font = '700 96px Georgia';
-  context.fillStyle = blueprint.accentColor;
-  context.fillText(
-    blueprint.labelBrandName ?? blueprint.brandName.toUpperCase(),
-    canvas.width / 2,
-    320,
+  const brandText = blueprint.labelBrandName ?? blueprint.brandName.toUpperCase();
+  setFittedFont(
+    context,
+    brandText,
+    canvas.width - 224,
+    96,
+    64,
+    700,
+    'Georgia, "Times New Roman", serif',
   );
+  context.fillStyle = blueprint.accentColor;
+  context.fillText(brandText, canvas.width / 2, 320);
 
   context.font = '600 40px Georgia';
   context.fillStyle = '#23333a';
