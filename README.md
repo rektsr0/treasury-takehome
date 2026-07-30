@@ -1,5 +1,7 @@
 # Label Lens
 
+[![Quality checks](https://github.com/rektsr0/treasury-takehome/actions/workflows/quality.yml/badge.svg)](https://github.com/rektsr0/treasury-takehome/actions/workflows/quality.yml)
+
 Take-home project for Treasury RGB.
 
 This app checks alcohol label images against application fields using local OCR. It supports a batch queue, shows the extracted text, and flags missing or mismatched fields before manual review.
@@ -58,6 +60,16 @@ npm run dev
 ```
 
 `npm install` and `npm run build` both copy the local Tesseract assets through `scripts/copy-tesseract-assets.mjs`.
+
+## Verification
+
+```bash
+npm run lint
+npm run build
+python -m pytest -q
+```
+
+The pytest suite covers field matching, warning-heading enforcement, alcohol mismatches, deployable asset paths, and obvious committed secret patterns.
 
 ## Docker
 

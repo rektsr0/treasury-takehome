@@ -335,7 +335,9 @@ export const verifyApplicationRecord = (
     failedCount > 0
       ? `${failedCount} check${failedCount === 1 ? '' : 's'} need attention.`
       : manualCount > 0
-        ? `${manualCount} item${manualCount === 1 ? '' : 's'} still need review.`
+        ? `${manualCount} item${manualCount === 1 ? '' : 's'} still ${
+            manualCount === 1 ? 'needs' : 'need'
+          } review.`
         : 'All checks passed.';
 
   return {

@@ -60,6 +60,7 @@ def test_verify_application_record_pass_case() -> None:
     result = run_node_json(script)
 
     assert result["overall"] == "pass"
+    assert result["headline"] == "1 item still needs review."
     assert result["failedCount"] == 0
     assert result["manualCount"] == 1
     assert any(

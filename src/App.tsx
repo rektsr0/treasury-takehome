@@ -105,6 +105,7 @@ function App() {
   const [isBatchReviewing, setIsBatchReviewing] = useState(false);
   const [ocrState, setOcrState] = useState<'warming' | 'ready' | 'error'>('warming');
   const recordsRef = useRef(records);
+  const activeReviewIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     recordsRef.current = records;
@@ -249,10 +250,7 @@ function App() {
   };
 
   const reviewRecord = async (id: string) => {
-    const anotherReviewIsActive = recordsRef.current.some(
-      (entry) => entry.id !== id && entry.isReviewing,
-    );
-    if (anotherReviewIsActive) {
+    if (activeReviewIdRef.current) {
       return;
     }
 
@@ -273,6 +271,7 @@ function App() {
       return;
     }
 
+    activeReviewIdRef.current = id;
     updateRecord(id, (currentRecord) => ({
       ...currentRecord,
       error: undefined,
@@ -304,6 +303,8 @@ function App() {
         isReviewing: false,
         progressText: undefined,
       }));
+    } finally {
+      activeReviewIdRef.current = null;
     }
   };
 
@@ -349,7 +350,11 @@ function App() {
 
         <aside className="hero-aside">
           <div className="seal-card">
-            <span className={`state-pill state-pill--${ocrState}`}>
+            <span
+              className={`state-pill state-pill--${ocrState}`}
+              role="status"
+              aria-live="polite"
+            >
               OCR {ocrState === 'warming' ? 'warming up' : ocrState}
             </span>
             <p>
@@ -445,7 +450,12 @@ function App() {
                       <p className="eyebrow">Application {index + 1}</p>
                       <h3>{record.brandName || record.label?.name || 'Untitled application'}</h3>
                     </div>
-                    <span className={`status-chip status-chip--${status.tone}`}>{status.label}</span>
+                    <span
+                      className={`status-chip status-chip--${status.tone}`}
+                      aria-live="polite"
+                    >
+                      {status.label}
+                    </span>
                   </header>
 
                   <div className="record-grid">
@@ -577,8 +587,16 @@ function App() {
                         </div>
                       )}
 
-                      {record.progressText ? <p className="progress-note">{record.progressText}</p> : null}
-                      {record.error ? <p className="error-banner">{record.error}</p> : null}
+                      {record.progressText ? (
+                        <p className="progress-note" role="status" aria-live="polite">
+                          {record.progressText}
+                        </p>
+                      ) : null}
+                      {record.error ? (
+                        <p className="error-banner" role="alert">
+                          {record.error}
+                        </p>
+                      ) : null}
 
                       {record.review ? (
                         <div className="review-panel">

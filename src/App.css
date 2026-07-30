@@ -271,6 +271,14 @@
   transform: translateY(-1px);
 }
 
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.ghost-button:focus-visible,
+.file-button:has(input:focus-visible) {
+  outline: 3px solid rgba(31, 86, 98, 0.42);
+  outline-offset: 3px;
+}
+
 .primary-button {
   border: 1px solid transparent;
   background: linear-gradient(135deg, #1f5662, #284149);
@@ -494,5 +502,17 @@ button:disabled,
   .record-header,
   .review-summary {
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record-card {
+    animation: none;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .ghost-button {
+    transition: none;
   }
 }
