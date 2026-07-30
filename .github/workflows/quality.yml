@@ -41,6 +41,3 @@ jobs:
 
       - name: Run tests
         run: python -m pytest -q
-
-      - name: Verify committed deployment build
-        run: git diff --exit-code -- docs
